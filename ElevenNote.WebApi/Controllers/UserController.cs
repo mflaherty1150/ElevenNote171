@@ -1,5 +1,7 @@
 using ElevenNote.Models.Responses;
+using ElevenNote.Models.Token;
 using ElevenNote.Models.User;
+using ElevenNote.Services.Token;
 using ElevenNote.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +13,12 @@ namespace ElevenNote.WebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ITokenService _tokenService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, ITokenService tokenService)
         {
             _userService = userService;
+            _tokenService = tokenService;
         }
 
         [HttpPost("Register")]
@@ -44,6 +48,20 @@ namespace ElevenNote.WebApi.Controllers
             if (userDetail is null) return NotFound();
 
             return Ok(userDetail);
+        }
+
+        [HttpPost("~/api/Token")]
+        public async Task<IActionResult> Gettoken([FromBody] TokenRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            TokenResponse? response = await _tokenService.GetTokenAsync(request);
+
+            if (response is null)
+                return BadRequest(new TextResponse("Invalid username or password."));
+
+            return Ok(response);
         }
     }
 }
