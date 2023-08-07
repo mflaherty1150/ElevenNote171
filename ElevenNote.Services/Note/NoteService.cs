@@ -84,4 +84,27 @@ public class NoteService : INoteService
             ModifiedUtc = entity.ModifiedUtc
         };
     }
+
+    public async Task<bool> UpdateNoteAsync(NoteUpdate request)
+    {
+        // find the note and validate it's owned by the user
+        NoteEntity? entity = await _dbContext.Notes.FindAsync(request.Id);
+
+        // By using the null conditional operator we can check if it's null
+        // and at the same time we check the OwnerId vs the _userId
+        if (entity?.OwnerId != _userId)
+            return false;
+
+        // Now we update the entity's properties
+        entity.Title = request.Title;
+        entity.Content = request.Content;
+        entity.ModifiedUtc = DateTimeOffset.Now;
+
+        // Save the changes to the database and capture how many rows were updated
+        int numberOfChages = await _dbContext.SaveChangesAsync();
+
+        // numberOfChanges is stated to be equal to 1 because only one row is updated
+        return numberOfChages == 1;
+
+    }
 }
