@@ -39,5 +39,19 @@ public class NoteController : ControllerBase
         var notes = await _noteService.GetAllNotesAsync();
         return Ok(notes);
     }
+
+    // GET api/Note/5
+    [HttpGet("{noteId:int}")]
+    public async Task<IActionResult> GetNoteById([FromRoute] int noteId)
+    {
+        NoteDetail? detail = await _noteService.GetNoteByIdAsync(noteId);
+
+        // Similar to our service method, we're using a ternary to determine our return type
+        // If the returned value (deail) is not null, we'll return it inside a 200 OK
+        // Ohterwise we'll return a NotFound() 404 response
+        return detail is not null   
+            ? Ok(detail)
+            : NotFound();
+    }
 }
 
