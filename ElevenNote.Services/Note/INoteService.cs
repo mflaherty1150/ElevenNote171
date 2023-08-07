@@ -8,4 +8,5 @@ public interface INoteService
     Task<IEnumerable<NoteListItem>> GetAllNotesAsync();
     Task<NoteDetail?> GetNoteByIdAsync(int noteId);
     Task<bool> UpdateNoteAsync(NoteUpdate request);
+    Task<bool> DeleteNoteAsync(int noteId);
 }
